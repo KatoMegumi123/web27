@@ -1,0 +1,73 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+header {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+nav{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: stretch;
+}
+
+#NEW-BLIZ-logo {
+    padding: 300px;
+}
+  
+nav a {
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+#main {
+    background-color: aqua;
+    text-align:center;
+    height: 600px;
+}
+
+#alloptions {
+    margin: auto;
+    margin-top: 30px;
+    display: grid;
+    width: 50%;
+    height: 400px;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 33% 33% 33%;
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+}
+
+#alloptions .options{
+    display: flex;
+    background-color: white;
+    text-align: left;
+    padding-top: 20px;
+    flex-direction: row-reverse;
+    box-shadow: 5px 10px #888888;
+    border-radius: 20px;
+}
+
+.options img {
+    width: 80%;
+    height: auto;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    align-self: center;
+    padding-top: 100%;
+}
+
+#alloptions .options .logo{
+    width: 30%;
+}
+
