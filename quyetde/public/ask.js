@@ -1,7 +1,6 @@
 window.onload = () => {
     
     const submitButton = document.querySelector('.submit-button');
-    console.log(submitButton);
     if(submitButton)
     {
         submitButton.addEventListener('click',(event)  => {
@@ -15,7 +14,7 @@ window.onload = () => {
             body: JSON.stringify({
                 questionContent: textAreaValue,
             }),
-        })
+            })
             .then((response)=>{
                 // response.json() only when server reponse with json
                 // response.text() only when server response with string
@@ -23,7 +22,7 @@ window.onload = () => {
             })
             .then((data)=>{
                 // xu ly response data
-                console.log('Data: ',data);
+                window.location.href = `/questions/${data.data.id}`;
             })
             .catch((error)=>{
                 console.log(error);
