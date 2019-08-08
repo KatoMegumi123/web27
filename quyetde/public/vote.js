@@ -8,13 +8,12 @@ window.onload = () => {
     .then((data)=>{
         if(data.success)
         {
-            var reciveData = JSON.parse(data.data);
-            console.log(reciveData);
+            var reciveData = data.data;
             let questionContent = document.getElementById("question-content");
-            var questionId = reciveData.questionId;
+            var questionId = reciveData._id;
             let like = document.getElementById("like");
             let dislike = document.getElementById("dislike");
-            questionContent.innerText = reciveData.questionContent;
+            questionContent.innerText = reciveData.content;
             like.addEventListener("click",(event)=>{
                 fetch(`/vote/${questionId}/like`,{
                     method: 'PUT',

@@ -11,12 +11,12 @@ window.onload = () => {
     .then((data)=>{
         if(data.success)
         {
-            reciveData = JSON.parse(data.data);
+            reciveData = data.data;
             let questionName = document.getElementById("question-name");
             let voteCount = document.getElementById("vote-count");
             let like = document.getElementById("like");
             let dislike = document.getElementById("dislike");
-            questionName.innerText = reciveData.questionContent;
+            questionName.innerText = reciveData.content;
             voteCount.innerText = `So luot vote: ${reciveData.like + reciveData.dislike}`;
             like.innerText = `Like: ${reciveData.like}`;
             dislike.innerText = `Dislike: ${reciveData.dislike}`;
