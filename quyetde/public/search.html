@@ -12,13 +12,14 @@
         <a href="/">Dap gon</a>
         <a href="/search">Tim kiem</a>
     </div>
-    <h1 id="question-name"></h1>
-    <p id="vote-count"></p>
     <div>
-        <button id = "like" style="color: blue"></button>
-        <button id = "dislike" style="color: red"></button>
+        <h1>Enter a pattern to search</h1>
+        <form>
+            <input type="text" id="pattern">
+            <button id="search-button" type="button">Search</button>
+        </form>
+        <div id="results"></div>
     </div>
-    <div><a href="/"><button>Cau hoi khac</button></a></div>
-    <script src = "/question.js"></script>
+    <script src="/search.js"></script>
 </body>
 </html>

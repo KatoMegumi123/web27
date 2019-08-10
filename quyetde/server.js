@@ -129,6 +129,30 @@ mongoose.connect('mongodb://localhost:27017/quyetde',{useNewUrlParser: true},(e)
                 console.log('Dang nghe o cong 3000...');
             }
         });
+        
+        app.get('/search',(req,res)=>{
+            res.sendFile(path.resolve(__dirname,'./public/search.html'));
+        });
+
+        app.get("/search-by-pattern/:pattern",(req,res)=>{
+            const pattern = req.params.pattern;
+            QuestionModel.find({"content":{$regex: pattern}},(err,docs)=>{
+                if(err)
+                {
+                    res.status(500).json({
+                        success: false,
+                        message: err.message,
+                    });
+                }
+                else
+                {
+                    res.status(201).json({
+                        success: true,
+                        data: docs,
+                    });
+                }
+            });
+        });
     }
 });
 
