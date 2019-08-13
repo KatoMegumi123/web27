@@ -18,8 +18,20 @@ window.onload = () => {
             let dislike = document.getElementById("dislike");
             questionName.innerText = reciveData.content;
             voteCount.innerText = `So luot vote: ${reciveData.like + reciveData.dislike}`;
-            like.innerText = `Like: ${reciveData.like}`;
-            dislike.innerText = `Dislike: ${reciveData.dislike}`;
+            if(reciveData.like !== 0)
+                like.innerText = `Like: ${reciveData.like}`;
+            if(reciveData.dislike !== 0)
+                dislike.innerText = `Dislike: ${reciveData.dislike}`;
+            if(reciveData.like + reciveData.dislike==0)
+            {
+                like.style.width = "50%";
+                dislike.style.width = "50%";
+            }
+            else
+            {
+                like.style.width = `${reciveData.like/(reciveData.like + reciveData.dislike)*100}%`;
+                dislike.style.width = `${reciveData.dislike/(reciveData.like + reciveData.dislike)*100}%`;
+            }
         }
         else
         {  

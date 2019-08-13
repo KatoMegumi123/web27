@@ -11,7 +11,6 @@ window.onload = ()=>{
             const results = document.getElementById('results');
             results.innerHTML='';
             var para;
-            var t;
             for(let items of data.data)
             {
                 para = document.createElement("P");

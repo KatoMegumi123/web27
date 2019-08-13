@@ -1,0 +1,49 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+
+.container {
+    width: 70%;
+    margin: 0 auto;
+    display: flex;
+}
+
+.main-content {
+    width: 75%;
+    text-align: justify;
+    margin-top: 20px;
+}
+
+.side-bar{
+    padding-left: 24px;
+}
+
+@media screen and (max-width: 768px){
+    .container{
+        width: 100%;
+        padding: 10px;
+        display: flex;
+        flex-direction: column-reverse;
+    }
+
+    .main-content{
+        width: 100%;
+        text-align: justify;
+    }
+
+    .side-bar{
+        width: 100%;
+        position: relative;
+    }
+
+    .menu{
+        width: 100%;
+        background-color: wheat;
+        display: flex;
+        justify-content: space-evenly;
+        position: fixed;
+        left: 0;
+    }
+}

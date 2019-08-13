@@ -28,14 +28,14 @@ mongoose.connect('mongodb://localhost:27017/quyetde',{useNewUrlParser: true},(e)
                     res.status(500).json({
                         success: false,
                         message: err.message,
-                    })
+                    });
                 }
                 else
                 {
                     res.status(201).json({
                         success: true,
                         data: response[0],
-                    })
+                    });
                 }
             });
         });
@@ -59,7 +59,6 @@ mongoose.connect('mongodb://localhost:27017/quyetde',{useNewUrlParser: true},(e)
                 }
                 else
                 {
-                    console.log(data);
                     res.status(201).json({
                         success: true,
                         data: {
@@ -82,7 +81,7 @@ mongoose.connect('mongodb://localhost:27017/quyetde',{useNewUrlParser: true},(e)
             const vote = req.params.vote;
             var updateContent = {};
             updateContent[vote] = 1;
-            QuestionModel.findByIdAndUpdate(questionId,{$inc:updateContent},(err,data)=>{
+            QuestionModel.findByIdAndUpdate(questionId,{$inc:{[vote]:1}},(err,data)=>{
                 if(err)
                 {
                     res.status(500).json({
@@ -112,10 +111,20 @@ mongoose.connect('mongodb://localhost:27017/quyetde',{useNewUrlParser: true},(e)
                 }
                 else
                 {
-                    res.status(201).json({
-                        success: true,
-                        data: data,
-                    });
+                    if(!data)
+                    {
+                        res.status(404).json({
+                            success: false,
+                            message: "Not found",
+                        });
+                    }
+                    else
+                    {
+                        res.status(201).json({
+                            success: true,
+                            data: data,
+                        });
+                    }    
                 }
             });    
         });
@@ -136,7 +145,7 @@ mongoose.connect('mongodb://localhost:27017/quyetde',{useNewUrlParser: true},(e)
 
         app.get("/search-by-pattern/:pattern",(req,res)=>{
             const pattern = req.params.pattern;
-            QuestionModel.find({"content":{$regex: pattern}},(err,docs)=>{
+            QuestionModel.find({"content":{$regex: pattern, $options: 'i'}},(err,docs)=>{
                 if(err)
                 {
                     res.status(500).json({
