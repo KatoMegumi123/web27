@@ -1,0 +1,17 @@
+.container{
+    padding: 50px;
+}
+
+.Players{
+    display: flex;
+    flex-direction: column;
+}
+.Players textarea{
+    margin: 20px;
+    width: 100%;
+    border: 2px solid pink;
+}
+
+.title1{
+    border-bottom: 2px solid lightgray;
+}
