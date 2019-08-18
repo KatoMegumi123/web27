@@ -14,7 +14,7 @@ window.onload=function(){
         })
         .then(function(data){
             console.log(data);
-            window.location.href=`/games/${data.id}`
+            window.location.href=`/games/${data.data.id}`
         })
         .catch((error)=>{
             console.log(error);
