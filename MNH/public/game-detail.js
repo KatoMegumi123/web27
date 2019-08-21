@@ -67,6 +67,30 @@ window.onload = function () {
             }
             addRoundBtn.addEventListener('click', function (event) {
                 i++;
+                fetch(`/update`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id: gameId,
+                        player: 1,
+                        round: i,
+                        ketquamoi: 0,
+                    })
+
+                })
+                    .then(function (res) {
+                        return res.json();
+                    })
+                    .then(function (doc) {
+                        console.log(doc);
+                        document.querySelector(`#player${player}sum`).innerHTML = doc.data;
+                    })
+                    .catch((err)=>{
+                        console.log(err);
+                        window.alert(err.message);
+                    });
                 tr = document.createElement("TR");
                 tr.innerHTML = `<th scope="row">${i}</th>
             <td><input type='number' value=0 id="1${i}"></td>
@@ -99,7 +123,10 @@ window.onload = function () {
                             })
                             .then(function (doc) {
                                 console.log(doc);
-                                document.querySelector(`#player${player}sum`).innerHTML = doc.data;
+                            })
+                            .catch((err)=>{
+                                console.log(err);
+                                window.alert(err.message);
                             });
                     })
                 }
