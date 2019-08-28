@@ -1,6 +1,5 @@
 import React from 'react';
-import logo from './logo.svg';
-import TodoItem from './components/TodoItem'
+import VideoItem from './components/VideoItem'
 import './App.css';
 
 // const App = (props)=>{
@@ -12,76 +11,123 @@ import './App.css';
 class App extends React.Component {
   state = {
     inputValue: '',
-    todos: [], //{content: '',finished: boolean}
+    keyword: '',
+    pageToken: '',
+    videos: [],
+    loading: false,
   };
+
+  componentDidMount(){
+    window.addEventListener('scroll',this.handleScroll);
+  }
+
+  componentWillUnmount(){
+    window.removeEventListener('scroll', this.handleScroll);
+  }
 
   handleSubmit = (event) => {
     event.preventDefault();
-    const newTodo = {
-      content: this.state.inputValue,
-      finished: false,
-    };
     this.setState({
-      inputValue: '',
-      todos: [...this.state.todos, newTodo]
-    });
+      keyword: this.state.inputValue,
+      nextPageToken: '',
+      loading: true,
+      videos: []
+    })
+    var keyword = this.state.inputValue;
+    fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=25&q=${keyword}&type=video&key=AIzaSyA9gQZ-oYomFypZN7PsupZJtOfQqA6Q3qw`)
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data.items);
+        let newVideos = [];
+        for (let item of data.items) {
+          let newVideo = {};
+          newVideo.id = item.id.videoId;
+          newVideo.thumbnail = item.snippet.thumbnails.medium.url;
+          newVideo.title = item.snippet.title;
+          newVideo.description = item.snippet.description;
+          newVideos.push(newVideo);
+        };
+        this.setState(
+          {
+            pageToken: data.nextPageToken,
+            videos: [...this.state.videos, ...newVideos],
+            loading: false,
+          }
+        )
+        console.log(this.state.videos);
+
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
-  handleInputChange = (event)=>{
+  handleInputChange = (event) => {
     const newValue = event.target.value;
     this.setState({
       inputValue: newValue,
     });
   };
 
-  updateTodoItem = (itemIndex) =>{
-    this.setState({
-      todos: this.state.todos.map((value,index)=>{
-        if(index===itemIndex)
+  handleScroll = (event) =>{
+    if((document.documentElement.offsetHeight-window.innerHeight-window.scrollY<=200)){
+      console.log('shit');
+      let nextPageToken = this.state.nextPageToken;
+      var keyword = this.state.keyword;
+      fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=25&q=${keyword}&type=video&key=AIzaSyA9gQZ-oYomFypZN7PsupZJtOfQqA6Q3qw&pageToken=${nextPageToken}`)
+      .then((response)=>{
+        return response.json();
+      })
+      .then((data)=>{
+        let newVideos = [];
+        for (let item of data.items) {
+          let newVideo = {};
+          newVideo.id = item.id.videoId;
+          newVideo.thumbnail = item.snippet.thumbnails.medium.url;
+          newVideo.title = item.snippet.title;
+          newVideo.description = item.snippet.description;
+          newVideos.push(newVideo);
+        };
+        this.setState(
           {
-            return {
-              ...value,
-              finished: true,
-            }
+            pageToken: data.nextPageToken,
+            videos: [...this.state.videos, ...newVideos],
+            loading: false,
           }
-        else return value;
+        )
       })
-    })
-  };
-
-  deleteTodoItem = (itemIndex) =>{
-    this.setState({
-      todos: this.state.todos.filter((value,index)=>{
-        return index!==itemIndex;
-      })
-    });
+      .catch()
+    }
   }
 
   render() {
     return (
-      <div className='container'>
-        <div className='result'>
-          {this.state.todos.map((value,index)=>{
-            return (
-              <TodoItem value={value.content} finished={value.finished} key={index} updateTodoItem={this.updateTodoItem} itemIndex={index} deleteTodoItem={this.deleteTodoItem} />
-            );
-          })}
-        </div>
+      <div className='container' onScroll={this.handleScroll}>
         <div className='todo-form' onSubmit={this.handleSubmit}>
           <form className="form-inline">
             <div className="form-group mx-sm-3 mb-2">
               <label htmlFor="input-to-do" className="sr-only">To do</label>
               <input
                 type="text"
-                className="form-control" 
-                id="input-to-do" 
-                placeholder="What to do..." 
-                value={this.state.inputValue} 
+                className="form-control"
+                id="input-to-do"
+                placeholder="What to do..."
+                value={this.state.inputValue}
                 onChange={this.handleInputChange}
               />
             </div>
             <button type="submit" className="btn btn-primary mb-2">Add this sh*t</button>
           </form>
+        </div>
+        <div className='result'>
+          {this.state.videos.map((value, index) => {
+            return (
+              <VideoItem id={value.id} thumbnail={value.thumbnail} title={value.title} description={value.description} key={index} />
+            );
+          })}
+          {(this.loading) ? (<div>Loading...</div>) : <div></div>}
         </div>
       </div>
     );
