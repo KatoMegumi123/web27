@@ -17,11 +17,11 @@ class App extends React.Component {
     loading: false,
   };
 
-  componentDidMount(){
+  componentWillUpadate(){
     window.addEventListener('scroll',this.handleScroll);
   }
 
-  componentWillUnmount(){
+  componentWillUpdate(){
     window.removeEventListener('scroll', this.handleScroll);
   }
 

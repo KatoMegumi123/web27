@@ -15,6 +15,12 @@ mongoose.connect('mongodb://localhost:27017/minihackathon', { useNewUrlParser: t
 
         app.use(express.static('public'));
         app.use(bodyParser.json());
+        app.use((req,res,next)=>{
+            res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+            res.header("Access-Control-Allow-Methods", "*");
+            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+            next();
+        });
 
         app.get('/', (req, res) => {
             res.sendFile(path.resolve(__dirname, './public/scorekeeper.html'));
@@ -55,7 +61,6 @@ mongoose.connect('mongodb://localhost:27017/minihackathon', { useNewUrlParser: t
             res.sendFile(path.resolve(__dirname, './public/game-detail.html'));
         });
 
-
         app.get("/get-game-detail", (req, res) => {
             const gameId = req.query.id;
             GamesModel.findById(gameId, (err, data) => {
@@ -82,23 +87,19 @@ mongoose.connect('mongodb://localhost:27017/minihackathon', { useNewUrlParser: t
             });
         });
 
-
-        app.listen(3000, (error) => {
+        app.listen(3001, (error) => {
             if (error) {
                 console.log(error);
             }
             else {
-                console.log('Dang nghe o cong 3000...');
+                console.log('Dang nghe o cong 3001...');
             }
         });
 
-        app.get('/search', (req, res) => {
-            res.sendFile(path.resolve(__dirname, './public/search.html'));
-        });
-
-        app.get("/search-by-pattern/:pattern", (req, res) => {
-            const pattern = req.params.pattern;
-            QuestionModel.find({ "content": { $regex: pattern, $options: 'i' } }, (err, docs) => {
+        app.post('/update', (req, res) => {
+            console.log(req.body);
+            var id = req.body.id;
+            GamesModel.findById(id, (err, data) => {
                 if (err) {
                     res.status(500).json({
                         success: false,
@@ -106,12 +107,26 @@ mongoose.connect('mongodb://localhost:27017/minihackathon', { useNewUrlParser: t
                     });
                 }
                 else {
+                    var newData = data._doc;
+                    console.log(newData);
+                    for (let i = 0; i < 4; i++) {
+                        newData.players[i].game.push(0);
+                    }
+                    GamesModel.findByIdAndUpdate(id, { $set: { players: newData.players } }, (err) => {
+                        if (err) {
+                            console.log(err);
+                            res.status(500).json({
+                                success: false,
+                                message: err.message
+                            });
+                        }
+                    });
                     res.status(201).json({
                         success: true,
-                        data: docs,
                     });
                 }
-            });
+            })
+
         });
 
         app.put('/update', (req, res) => {
