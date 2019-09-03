@@ -16,6 +16,12 @@ mongoose.connect('mongodb://localhost:27017/quyetde',{useNewUrlParser: true},(e)
 
         app.use(express.static('public'));
         app.use(bodyParser.json());
+        app.use((req,res,next)=>{
+            res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+            res.header("Access-Control-Allow-Methods", "*");
+            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+            next();
+        });
 
         app.get('/', (req,res)=>{
             res.sendFile(path.resolve(__dirname,'./public/vote.html'));
@@ -128,16 +134,6 @@ mongoose.connect('mongodb://localhost:27017/quyetde',{useNewUrlParser: true},(e)
                 }
             });    
         });
-
-        app.listen(3000, (error)=>{
-            if(error)
-            {
-                console.log(error);
-            }
-            else{
-                console.log('Dang nghe o cong 3000...');
-            }
-        });
         
         app.get('/search',(req,res)=>{
             res.sendFile(path.resolve(__dirname,'./public/search.html'));
@@ -161,6 +157,16 @@ mongoose.connect('mongodb://localhost:27017/quyetde',{useNewUrlParser: true},(e)
                     });
                 }
             });
+        });
+
+        app.listen(3001, (error)=>{
+            if(error)
+            {
+                console.log(error);
+            }
+            else{
+                console.log('Dang nghe o cong 3001...');
+            }
         });
     }
 });
