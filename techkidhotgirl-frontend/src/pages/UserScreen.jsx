@@ -63,7 +63,7 @@ class UserScreen extends Component {
     else {
       return (
         <div>
-          <a href="/login"><button className="btn btn-info btn-md">Login</button></a>
+          <p className="text-center align-middle">You are not logged in. To log in click <span><a href="/login">Login</a></span></p>
         </div>
       )
     }
