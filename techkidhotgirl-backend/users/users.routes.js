@@ -58,6 +58,7 @@ userRouter.post("/login", async (req, res) => {
         req.session.currentUser = {
           _id: data._id,
           email: data.email,
+          fullName: data.fullName,
         };
 
         res.status(200).json({
@@ -67,7 +68,7 @@ userRouter.post("/login", async (req, res) => {
       }
       else {
         res.status(400).json({
-          success: true,
+          success: false,
           message: "Wrong password",
         })
       }
@@ -92,6 +93,7 @@ userRouter.get('/test',(req,res)=>{
   console.log(req.session.currentUser);
   res.json({
     success: true,
+    data: req.session.currentUser,
   })
 });
 
