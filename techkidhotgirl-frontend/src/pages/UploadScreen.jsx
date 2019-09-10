@@ -1,23 +1,41 @@
 import React, { Component } from 'react';
 
-class UserScreen extends Component {
+class UploadScreen extends Component {
   state = {
-    email: "",
-    username: "",
-    stories: [],
+    title: "",
+    content: "",
+    loading: false,
+    fail_message: "",
   }
 
   componentWillMount() {
     this.setState({
       email: window.localStorage.getItem('currentEmail'),
       username: window.localStorage.getItem('username'),
+      id: window.localStorage.getItem('id'),
     })
-    fetch('http://localhost:3001/users/stories', {
-      method: 'GET',
+  }
+
+  handleInputChange = (type, newValue) => {
+    this.setState({
+      [type]: newValue,
+    });
+  };
+
+  handleSubmit = (event) => {
+    this.setState({
+      loading: true,
+    })
+    fetch('http://localhost:3001/users/upload', {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       credentials: 'include',
+      body: JSON.stringify({
+        title: this.state.title,
+        content: this.state.content,
+      }),
     })
       .then((response) => {
         // response.json() only when server reponse with json
@@ -27,8 +45,15 @@ class UserScreen extends Component {
       .then((data) => {
         if (data.success) {
           this.setState({
-            stories: data.data,
+            loading: false,
           });
+          window.location.href = `/current-user`;
+        }
+        else {
+          this.setState({
+            fail_message: data.message,
+            loading: false,
+          })
         }
       })
       .catch((error) => {
@@ -55,10 +80,6 @@ class UserScreen extends Component {
       });
   }
 
-  upload = (event)=>{
-    window.location.href = '/upload';
-  }
-
   render() {
     if (this.state.email) {
       return (
@@ -73,24 +94,47 @@ class UserScreen extends Component {
               <div className="navbar-nav ">
                 <span className="nav-item nav-link">{this.state.email}</span>
                 <button className="nav-item nav-link btn btn-light btn-md" onClick={this.logout}>Log out</button>
-                <button className="nav-item nav-link btn btn-light btn-md" onClick={this.upload}>New Story</button>
               </div>
             </div>
           </div>
           <div className='container'>
-            <div className='row d-flex justify-content-around'>
-              {this.state.stories.map((value, index) => {
-                return (
-                  <div className="card col-3">
-                    <img src="..." className="card-img-top" style={{ width: "100%" }} alt="..."></img>
-                    <div className="card-body">
-                      <h5 className="card-title">{value.title}</h5>
-                      <p className="card-text">{value.content}</p>
-                      <button className="btn btn-primary">Go somewhere</button>
-                    </div>
-                  </div>)
-              })}
-            </div>
+            <h1 className='text-center'>New Story</h1>
+            <form>
+              <div class="form-group">
+                <label for="exampleFormControlInput1">Title</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="exampleFormControlInput1"
+                  placeholder="..."
+                  onChange={(event) => {
+                    this.handleInputChange("title", event.target.value);
+                  }}></input>
+              </div>
+              <div class="form-group">
+                <label for="exampleFormControlTextarea1">Content</label>
+                <textarea class="form-control"
+                  id="exampleFormControlTextarea1"
+                  rows="3"
+                  onChange={(event) => {
+                    this.handleInputChange("title", event.target.value);
+                  }}></textarea>
+              </div>
+              {(!this.state.fail_message) ? <div></div> : <div className="alert alert-danger">{this.state.fail_message}</div>}
+              <div className='row d-flex justify-content-center'>
+                {(!this.state.loading)
+                  ?
+                  <div className="form-group justify-content-center flex">
+                    <button className="btn btn-info btn-primary"
+                      onClick={this.handleSubmit}>Submit</button>
+                  </div>
+                  :
+                  <div className="spinner-border" role="status">
+                    <span className="sr-only">Loading...</span>
+                  </div>
+                }
+              </div>
+            </form>
           </div>
         </div>
       )
@@ -105,4 +149,4 @@ class UserScreen extends Component {
   }
 }
 
-export default UserScreen;
+export default UploadScreen;

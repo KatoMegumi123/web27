@@ -64,6 +64,10 @@ userRouter.post("/login", async (req, res) => {
         res.status(200).json({
           success: true,
           message: "Login success",
+          data: {
+            email: data.email,
+            fullName: data.fullName,
+          },
         })
       }
       else {
@@ -95,6 +99,76 @@ userRouter.get('/test',(req,res)=>{
     success: true,
     data: req.session.currentUser,
   })
+});
+
+userRouter.post('/upload',async (req,res)=>{
+  if(!req.session.currentUser)
+  {
+    res.status(400).json({
+      success: false,
+      message: 'Bad request',
+    });
+    return;
+  }
+  const id = req.session.currentUser._id;
+  if(id)
+  {
+    var newStory = {
+      title: req.body.title,
+      content: req.body.content,
+    }
+    console.log(newStory);
+    UsersModel.findByIdAndUpdate(id,{$push: {stories: newStory}},(err,data)=>{
+      if(err)
+      {
+        res.status(500).json({
+          success: false,
+          message: err.message,
+        });
+      }
+      else
+      {
+        res.status(200).json({
+          success: true,
+          data: newStory,
+        });
+      }
+    });
+  }
+  else
+  {
+    res.status(400).json({
+      success: false,
+      message: 'Bad request',
+    });
+  }
+});
+
+userRouter.get('/stories',async (req,res)=>{
+  if(!req.session.currentUser)
+  {
+    res.status(400).json({
+      success: false,
+      message: 'Bad request',
+    });
+    return;
+  }
+  const id = req.session.currentUser._id;
+  var data = await UsersModel.findById(id).lean();
+  if(data)
+  {
+    res.status(201).json({
+      success: true,
+      data: data.stories,
+    });
+  }
+  else
+  {
+    res.status(500).json({
+      success: false,
+      message: 'Not Found',
+    })
+  }
 });
 
 module.exports = userRouter;

@@ -5,6 +5,7 @@ class LoginScreen extends Component {
     username: "",
     password: "",
     fail_message: "",
+    loading: false,
   }
 
   handleUserNameChange = (event) => {
@@ -31,12 +32,17 @@ class LoginScreen extends Component {
       });
       return;
     }
+    this.setState({
+      loading: true,
+      fail_message: "",
+    });
+
     fetch('http://localhost:3001/users/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include' ,
+      credentials: 'include',
       body: JSON.stringify({
         email: this.state.username,
         password: this.state.password,
@@ -49,26 +55,32 @@ class LoginScreen extends Component {
       })
       .then((data) => {
         if (data.success) {
-          window.location.href = `/curren-user`;
+          this.setState({ loading: false, });
+          window.localStorage.setItem('currentEmail',data.data.email);
+          window.localStorage.setItem('username',data.data.fullName);
+          window.location.href='/current-user';
         }
         else {
           console.log(data);
           this.setState({
+            loading: false,
             fail_message: data.message,
           })
         }
       })
       .catch((error) => {
         console.log(error);
-        window.alert(error.message);
+        this.setState({
+          loading: false,
+          fail_message: error.message,
+        });
       });
   }
 
   render() {
     return (
       <div id="login">
-        <h3 className="text-center text-white pt-5">Login form</h3>
-        <div className="container">
+        <div className="container" style={{ marginTop: '80px' }}>
           <div id="login-row" className="row justify-content-center align-items-center">
             <div id="login-column" className="col-md-6">
               <div id="login-box" className="col-md-12">
@@ -94,10 +106,20 @@ class LoginScreen extends Component {
                       onChange={this.handlePasswordChange}></input>
                   </div>
                   {(!this.state.fail_message) ? <div></div> : <div className="alert alert-danger">{this.state.fail_message}</div>}
-                  <div className="form-group">
-                    <button className="btn btn-info btn-md" onClick={this.handleSubmit}>Login</button>
-                    <a href="/signup" className="float-right my-auto">Sign up here</a>
-                  </div>
+                  {
+                    (!this.state.loading)
+                      ?
+                      <div className="d-flex justify-content-around row">
+                        <button className="btn btn-info btn-md" onClick={this.handleSubmit}>Login</button>
+                        <div><a href="/signup">Sign up here</a></div>
+                      </div>
+                      :
+                      <div className="d-flex justify-content-around row">
+                        <div className="spinner-border " role="status">
+                          <span className="sr-only">Loading...</span>
+                        </div>
+                      </div>
+                  }
                 </form>
               </div>
             </div>

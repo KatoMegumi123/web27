@@ -1,4 +1,19 @@
 const mongoose = require('mongoose');
+
+const NewStorySchema = new mongoose.Schema({
+  title: {
+    type: String,
+  },
+  content: {
+    type: String,
+    require: true,
+  },
+  createdAt:{
+    type: Date,
+    default: new Date(),
+  }
+});
+
 const HotGirlSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -27,7 +42,8 @@ const HotGirlSchema = new mongoose.Schema({
   },
   lastModifedAt: {
     type: Date,
-  }
+  },
+  stories: [NewStorySchema],
 });
 
 const HotGirlsModel = mongoose.model('HotGirls', HotGirlSchema);

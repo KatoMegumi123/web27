@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+
+
 class SignUpScreen extends Component {
   state = {
     username: "",
@@ -7,6 +9,7 @@ class SignUpScreen extends Component {
     password: "",
     confirm_password: "",
     fail_message: "",
+    loading: false,
   }
 
   handleUserNameChange = (event) => {
@@ -42,6 +45,8 @@ class SignUpScreen extends Component {
   }
 
   handleSubmit = (event) => {
+    // eslint-disable-next-line
+    var emailRegex = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
     event.preventDefault();
     if (!this.state.username || !this.state.displayname || !this.state.password || !this.state.confirm_password) {
       this.setState({
@@ -55,6 +60,21 @@ class SignUpScreen extends Component {
       });
       return;
     }
+    if (!emailRegex.test(this.state.username)) {
+      this.setState({
+        fail_message: "Invalid email address"
+      });
+      return;
+    }
+    if (this.state.password.length < 6) {
+      this.setState({
+        fail_message: "Password must be at least 6 characters"
+      });
+      return;
+    }
+    this.setState({
+      loading: true,
+    })
     fetch('http://localhost:3001/users/register', {
       method: 'POST',
       headers: {
@@ -74,35 +94,41 @@ class SignUpScreen extends Component {
       })
       .then((data) => {
         if (data.success) {
+          this.setState({
+            loading: false,
+          });
           window.location.href = `/login`;
         }
         else {
           this.setState({
             fail_message: data.message,
+            loading: false,
           })
         }
       })
       .catch((error) => {
         console.log(error);
-        window.alert(error.message);
+        this.setState({
+          fail_message: error.message,
+          loading: false,
+        })
       });
   }
 
   render() {
     return (
-      <div id="login">
-        <h3 className="text-center text-white pt-5">SignUp form</h3>
-        <div className="container">
+      <div>
+        <div className="container" style={{ marginTop: '80px' }}>
           <div id="login-row" className="row justify-content-center align-items-center">
             <div id="login-column" className="col-md-6">
               <div id="login-box" className="col-md-12">
                 <form id="login-form" className="form">
                   <h3 className="text-center text-info">Sign Up</h3>
                   <div className="form-group">
-                    <label htmlFor="username" className="text-info">Email:</label><br></br>
+                    <label htmlFor="email" className="text-info">Email:</label><br></br>
                     <input type="text"
                       name="username"
-                      id="username"
+                      id="email"
                       className="form-control"
                       value={this.state.username}
                       onChange={this.handleUserNameChange}></input>
@@ -128,7 +154,7 @@ class SignUpScreen extends Component {
                   </div>
                   <div className="form-group">
                     <label htmlFor="password" className="text-info">Confirm Password:</label><br></br>
-                    <input type="text"
+                    <input type="password"
                       name="confirm-password"
                       id="confirm-password"
                       className="form-control"
@@ -137,9 +163,18 @@ class SignUpScreen extends Component {
                       onChange={this.handleConfirmPasswordChange}></input>
                   </div>
                   {(!this.state.fail_message) ? <div></div> : <div className="alert alert-danger">{this.state.fail_message}</div>}
-                  <div className="form-group">
-                    <button className="btn btn-info btn-md"
-                      onClick={this.handleSubmit}>Sign up</button>
+                  <div className='row d-flex justify-content-center'>
+                    {(!this.state.loading)
+                      ?
+                      <div className="form-group justify-content-center flex">
+                        <button className="btn btn-info btn-md"
+                          onClick={this.handleSubmit}>Sign up</button>
+                      </div>
+                      :
+                      <div className="spinner-border" role="status">
+                        <span className="sr-only">Loading...</span>
+                      </div>
+                    }
                   </div>
                 </form>
               </div>
