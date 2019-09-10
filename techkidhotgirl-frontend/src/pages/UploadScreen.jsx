@@ -12,7 +12,6 @@ class UploadScreen extends Component {
     this.setState({
       email: window.localStorage.getItem('currentEmail'),
       username: window.localStorage.getItem('username'),
-      id: window.localStorage.getItem('id'),
     })
   }
 
