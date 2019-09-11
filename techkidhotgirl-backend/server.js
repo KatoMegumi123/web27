@@ -7,6 +7,7 @@ const cors = require('cors');
 
 const mongoose = require('mongoose');
 const usersRouter = require('./users/users.routes');
+const postsRouter = require('./posts/posts.routes');
 
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
@@ -32,6 +33,7 @@ mongoose.connect('mongodb://localhost:27017/hotgirls', { useNewUrlParser: true }
             cookie: { secure: false },
         }));
         app.use('/users', usersRouter);
+        app.use('/posts', postsRouter);
 
         app.listen(3001, (error) => {
             if (error) {
