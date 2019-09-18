@@ -58,7 +58,7 @@ class LoginScreen extends Component {
           this.setState({ loading: false, });
           window.localStorage.setItem('currentEmail',data.data.email);
           window.localStorage.setItem('username',data.data.fullName);
-          window.location.href='/current-user';
+          window.location.href='/';
         }
         else {
           console.log(data);

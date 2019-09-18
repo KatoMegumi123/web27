@@ -144,31 +144,4 @@ userRouter.post('/upload',async (req,res)=>{
   }
 });
 
-userRouter.get('/stories',async (req,res)=>{
-  if(!req.session.currentUser)
-  {
-    res.status(400).json({
-      success: false,
-      message: 'Bad request',
-    });
-    return;
-  }
-  const id = req.session.currentUser._id;
-  var data = await UsersModel.findById(id).lean();
-  if(data)
-  {
-    res.status(201).json({
-      success: true,
-      data: data.stories,
-    });
-  }
-  else
-  {
-    res.status(500).json({
-      success: false,
-      message: 'Not Found',
-    })
-  }
-});
-
 module.exports = userRouter;

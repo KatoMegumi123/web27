@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
 
+const maxFileSize = 5000000;
+const imageFileRegex = /\.(gif|jpg|jpeg|tiff|png)$/i;
+
 class UploadScreen extends Component {
   state = {
-    title: "",
     content: "",
     loading: false,
     fail_message: "",
+    file: undefined,
+    imageUrl: "",
   }
 
   componentWillMount() {
@@ -21,47 +25,62 @@ class UploadScreen extends Component {
     });
   };
 
-  handleSubmit = (event) => {
+  handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!this.state.file) {
+      this.setState({
+        fail_message: 'No content'
+      });
+      return;
+    }
+    if (!this.state.content) {
+      this.setState({
+        fail_message: 'No image'
+      });
+      return;
+    }
     this.setState({
       loading: true,
-    })
-    fetch('http://localhost:3001/users/upload', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({
-        title: this.state.title,
-        content: this.state.content,
-      }),
-    })
-      .then((response) => {
-        // response.json() only when server reponse with json
-        // response.text() only when server response with string
-        return response.json();
+      fail_message: ''
+    });
+    try {
+      const formData = new FormData();
+      formData.append('image', this.state.file)
+      const upLoadResult = await fetch('http://localhost:3001/uploads/photos', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
       })
-      .then((data) => {
-        if (data.success) {
-          this.setState({
-            loading: false,
-          });
-          window.location.href = `/current-user`;
-        }
-        else {
-          this.setState({
-            fail_message: data.message,
-            loading: false,
-          })
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        this.setState({
-          fail_message: error.message,
-          loading: false,
+        .then((res) => { return res.json() });
+      console.log(upLoadResult);
+      const newStory = await fetch('http://localhost:3001/posts/create-post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          content: this.state.content,
+          imageUrl: upLoadResult.data,
         })
-      });
+      }).then((res) => { return res.json() });
+      if (newStory.success) {
+        this.setState({
+          loading: false,
+        },()=>{window.location.href='/current-user';})
+        
+      }
+      else {
+        this.setState({
+          loading: false,
+          fail_message: newStory.message,
+        })
+      }
+    }
+    catch (error) {
+      this.setState({
+        loading: false,
+        fail_message: error.message,
+      })
+    }
   }
 
   logout = (event) => {
@@ -77,6 +96,33 @@ class UploadScreen extends Component {
       .catch((error) => {
         console.log(error);
       });
+  }
+
+  handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (!file)
+      return;
+    if (!imageFileRegex.test(file.name)) {
+      this.setState({
+        fail_message: 'Invalid image file'
+      });
+      return;
+    }
+    if (file.size > maxFileSize) {
+      this.setState({
+        fail_message: 'File must be less then 5MB'
+      });
+      return;
+    }
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(file);
+    fileReader.onload = () => {
+      this.setState({
+        fail_message: '',
+        file: file,
+        imageUrl: fileReader.result,
+      });
+    }
   }
 
   render() {
@@ -99,24 +145,36 @@ class UploadScreen extends Component {
           <div className='container'>
             <h1 className='text-center'>New Story</h1>
             <form>
-              <div class="form-group">
-                <label for="exampleFormControlInput1">Title</label>
+              <div className="custom-file">
                 <input
-                  type="text"
-                  class="form-control"
-                  id="exampleFormControlInput1"
-                  placeholder="..."
-                  onChange={(event) => {
-                    this.handleInputChange("title", event.target.value);
-                  }}></input>
+                  type="file"
+                  className="custom-file-input"
+                  id="validatedCustomFile"
+                  required={true}
+                  onChange={this.handleFileChange}></input>
+                <label className="custom-file-label" htmlFor="validatedCustomFile">Choose file...</label>
               </div>
-              <div class="form-group">
-                <label for="exampleFormControlTextarea1">Content</label>
-                <textarea class="form-control"
+              {this.state.imageUrl ?
+                (<div style={{
+                  backgroundImage: `url(${this.state.imageUrl})`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  width: '100%',
+                  height: '400px',
+                }}>
+
+                </div>)
+                :
+                (<div></div>)}
+              <div className="form-group">
+                <label htmlFor="exampleFormControlTextarea1">Content</label>
+                <textarea className="form-control"
                   id="exampleFormControlTextarea1"
                   rows="3"
+                  value={this.state.content}
                   onChange={(event) => {
-                    this.handleInputChange("title", event.target.value);
+                    this.handleInputChange("content", event.target.value);
                   }}></textarea>
               </div>
               {(!this.state.fail_message) ? <div></div> : <div className="alert alert-danger">{this.state.fail_message}</div>}

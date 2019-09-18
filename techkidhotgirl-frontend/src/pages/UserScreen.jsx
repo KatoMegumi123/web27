@@ -11,33 +11,7 @@ class UserScreen extends Component {
     this.setState({
       email: window.localStorage.getItem('currentEmail'),
       username: window.localStorage.getItem('username'),
-    })
-    fetch('http://localhost:3001/users/stories', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    })
-      .then((response) => {
-        // response.json() only when server reponse with json
-        // response.text() only when server response with string
-        return response.json();
-      })
-      .then((data) => {
-        if (data.success) {
-          this.setState({
-            stories: data.data,
-          });
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        this.setState({
-          fail_message: error.message,
-          loading: false,
-        })
-      });
+    });
   }
 
   logout = (event) => {
